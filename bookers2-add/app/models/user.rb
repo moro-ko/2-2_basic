@@ -20,6 +20,12 @@ class User < ApplicationRecord
   # has_many :yyy, through: :xxx, source: :zzz
   has_many :followings, through: :relationships, source: :followed
   has_many :followers, through: :reverse_of_relationships, source: :follower
+  
+# バリデーション
+  validates :name, length: { minimum: 2, maximum: 20 }, uniqueness: true
+  validates :introduction, length: { maximum: 50 }
+
+# フォロー機能
 # メソッドの記述:コントローラーをスッキリできる
   # フォローしたときの処理
   def follow(user_id)
@@ -34,10 +40,25 @@ class User < ApplicationRecord
     followings.include?(user)
   end
   
-# バリデーション
-  validates :name, length: { minimum: 2, maximum: 20 }, uniqueness: true
-  validates :introduction, length: { maximum: 50 }
-
+# 検索機能/検索方法分岐
+  def self.looks(search, word)
+    # 完全一致
+    if search == "perfect_match"
+      @user = User.where("name LIKE?", "#{word}")
+    # 前方一致
+    elsif search == "forward_match"
+      @user = User.where("name LIKE?","#{word}%")
+    # 後方一致
+    elsif search == "backward_match"
+      @user = User.where("name LIKE?","%#{word}")
+    # 部分一致
+    elsif search == "partial_match"
+      @user = User.where("name LIKE?","%#{word}%")
+    else
+      @user = User.all
+    end
+  end
+      
   
   
   def get_profile_image
