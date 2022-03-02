@@ -53,13 +53,12 @@ class User < ApplicationRecord
       @user = User.where("name LIKE?", '%'+word )
     # 部分一致
     elsif search == "partial_match"
-      @user = User.where("name LIKE?", '%'+word+'%')
+      @user = User.where("name LIKE?", '%'+word+'%' )
     else
       @user = User.all
     end
   end
       
-  
   
   def get_profile_image
     (profile_image.attached?) ? profile_image : 'no_image.jpg'
